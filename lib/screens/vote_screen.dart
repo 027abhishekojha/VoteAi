@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-class ResultsScreen extends StatelessWidget {
-  const ResultsScreen({super.key});
+class VoteScreen extends StatelessWidget {
+  const VoteScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Results'),
+        title: const Text('Vote'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: const Center(
-        child: Text('Results Page'),
+        child: Text('Voting Page'),
       ),
     );
   }
