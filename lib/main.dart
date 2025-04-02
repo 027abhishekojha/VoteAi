@@ -1,3 +1,4 @@
+import 'package:aivote/screens/candidates_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
@@ -10,6 +11,7 @@ import 'screens/settings_screen.dart';
 import 'screens/create_vote_screen.dart';
 import 'screens/verification_screen.dart';
 import 'screens/voting_region_screen.dart';
+import 'screens/available_elections_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +38,11 @@ class MyApp extends StatelessWidget {
         '/verify': (context) => const VerificationScreen(),
         '/verification': (context) => const VerificationScreen(),
         '/voting-region': (context) => const VotingRegionScreen(),
+        '/available-elections': (context) => const AvailableElectionsScreen(),
+        '/candidates': (context) {
+          final election = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+          return CandidatesScreen(election: election);
+        },
       },
     );
   }
