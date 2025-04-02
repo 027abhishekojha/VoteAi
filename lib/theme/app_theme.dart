@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static ThemeData lightTheme = ThemeData(
-    primaryColor: const Color(0xFF2563EB),
-    scaffoldBackgroundColor: Colors.white,
+    primaryColor: const Color(0xFF4CAF50),
+    scaffoldBackgroundColor: const Color(0xFFF5F9F5),
     colorScheme: ColorScheme.light(
-      primary: const Color(0xFF6366F1),
-      secondary: const Color(0xFF3B82F6),
+      primary: const Color(0xFF4CAF50),    // Fresh green
+      secondary: const Color(0xFF81C784),   // Light green
       surface: Colors.white,
-      background: const Color(0xFFF8FAFC),
-      tertiary: const Color(0xFFE0E7FF),
+      background: const Color(0xFFF5F9F5),  // Very soft green background
+      tertiary: const Color(0xFFE8F5E9),   // Softest green
     ),
     textTheme: const TextTheme(
       displayLarge: TextStyle(
@@ -33,7 +33,7 @@ class AppTheme {
     ),
     appBarTheme: AppBarTheme(
       elevation: 0,
-      backgroundColor: const Color(0xFF2563EB),
+      backgroundColor: const Color(0xFF4CAF50),
       iconTheme: const IconThemeData(color: Colors.white),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -41,7 +41,7 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 0,
-        backgroundColor: const Color(0xFF4F46E5),
+        backgroundColor: const Color(0xFF4CAF50),
         foregroundColor: Colors.white,
         textStyle: const TextStyle(
           fontSize: 18,
@@ -52,7 +52,7 @@ class AppTheme {
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: Colors.grey[100],
+      fillColor: const Color(0xFFE8F5E9),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,

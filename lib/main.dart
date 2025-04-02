@@ -22,8 +22,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      // home: const PagesPreview(),
-      home: const LoginScreen(),
+      home: const PagesPreview(),
+      // home: const LoginScreen(),
     );
   }
 }
@@ -63,6 +63,11 @@ class PagesPreview extends StatelessWidget {
         'title': 'Settings',
         'icon': Icons.settings,
         'widget': const SettingsScreen(),
+      },
+      {
+        'title': 'Login Page',
+        'icon': Icons.login,
+        'widget': const LoginScreen(),
       },
     ];
 
