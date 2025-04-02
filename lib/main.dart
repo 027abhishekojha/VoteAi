@@ -1,5 +1,7 @@
-import 'package:aivote/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'screens/splash_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/vote_screen.dart';
 import 'screens/results_screen.dart';
@@ -8,6 +10,7 @@ import 'screens/settings_screen.dart';
 import 'screens/create_vote_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -17,13 +20,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AI Vote Pages',
+      title: 'AI Vote',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
         useMaterial3: true,
       ),
-      home: const PagesPreview(),
-      // home: const LoginScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignupScreen(),
+        '/home': (context) => const HomeScreen(),
+      },
     );
   }
 }
@@ -68,6 +76,11 @@ class PagesPreview extends StatelessWidget {
         'title': 'Login Page',
         'icon': Icons.login,
         'widget': const LoginScreen(),
+      },
+      {
+        'title': 'Signup Page',
+        'icon': Icons.login,
+        'widget': const SignupScreen(),
       },
     ];
 

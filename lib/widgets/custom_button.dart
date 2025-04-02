@@ -1,3 +1,35 @@
+// import 'package:flutter/material.dart';
+//
+// class CustomButton extends StatelessWidget {
+//   final String text;
+//   final VoidCallback onPressed;
+//   final bool isLoading;
+//
+//   const CustomButton({
+//     Key? key,
+//     required this.text,
+//     required this.onPressed,
+//     this.isLoading = false,
+//   }) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return ElevatedButton(
+//       onPressed: isLoading ? null : onPressed,
+//       child: isLoading
+//           ? const SizedBox(
+//               width: 20,
+//               height: 20,
+//               child: CircularProgressIndicator(
+//                 strokeWidth: 2,
+//                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+//               ),
+//             )
+//           : Text(text),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
@@ -47,22 +79,22 @@ class CustomButton extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: isLoading
                   ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
+                height: 18,
+                width: 18,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
                   : Text(
-                      text,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
+                text,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ),
           ),
         ),

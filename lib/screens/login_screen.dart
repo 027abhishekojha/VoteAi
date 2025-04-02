@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart';
-import 'signup_screen.dart';
+
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+class LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  var _isLoading = false;
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
 
   @override
   void initState() {
@@ -34,6 +37,28 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleSignIn() async {
+    if (_isLoading) return; // Prevent multiple calls while loading
+
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() => _isLoading = true);
+      try {
+        await Future.delayed(const Duration(seconds: 2));
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed: ${e.toString()}')),
+          );
+        }
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -68,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           borderRadius: BorderRadius.circular(35),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF4CAF50).withOpacity(0.2),
+                              color: const Color(0xFF4CAF50).withAlpha(51),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -81,16 +106,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         ),
                       ),
                     ),
-                    // const SizedBox(height: 40),
-                    // Text(
-                    //   'Welcome Back!',
-                    //   style: Theme.of(context).textTheme.displayLarge,
-                    // ),
                     const SizedBox(height: 12),
-                    // Text(
-                    //   'Sign in to continue to AI Vote',
-                    //   style: Theme.of(context).textTheme.bodyLarge,
-                    // ),
                     const SizedBox(height: 20),
                     Container(
                       padding: const EdgeInsets.all(28),
@@ -99,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.05),
+                            color: Colors.grey.withAlpha(13),
                             blurRadius: 20,
                             spreadRadius: 10,
                           ),
@@ -112,8 +128,15 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             hint: 'Enter your email',
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            validator: (value) =>
-                                value?.isEmpty ?? true ? 'Email is required' : null,
+                            validator: (value) {
+                              if (value?.isEmpty ?? true) {
+                                return 'Email is required';
+                              }
+                              if (!_isValidEmail(value!)) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 24),
                           CustomTextField(
@@ -121,8 +144,15 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             hint: 'Enter your password',
                             controller: _passwordController,
                             isPassword: true,
-                            validator: (value) =>
-                                value?.isEmpty ?? true ? 'Password is required' : null,
+                            validator: (value) {
+                              if (value?.isEmpty ?? true) {
+                                return 'Password is required';
+                              }
+                              if ((value?.length ?? 0) < 6) {
+                                return 'Password must be at least 6 characters';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 8),
                           Align(
@@ -141,11 +171,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           const SizedBox(height: 32),
                           CustomButton(
                             text: 'Sign In',
-                            onPressed: () {
-                              if (_formKey.currentState?.validate() ?? false) {
-                                // Handle login
-                              }
-                            },
+                            onPressed: _handleSignIn,
+                            isLoading: _isLoading,
                           ),
                           const SizedBox(height: 24),
                           Text(
@@ -187,58 +214,51 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             'Don\'t have an account? ',
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
-                            onPressed: () {
-                              Navigator.push() {},
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignupScreen(),
-                                ),orScheme.primary,
-                              );ontWeight.bold,
-                            },fontSize: 18,
-                            child: Text(),
-                              'Sign Up',),
-                              style: TextStyle(),
-                                color: Theme.of(context).colorScheme.primary,],
-                                fontWeight: FontWeight.bold,),
+                          TextButton(
+                            onPressed: () => Navigator.pushNamed(context, '/signup'),
+
+                            child: Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                              ),const SizedBox(height: 20),
-                            ),],
-                          ),),
-                        ],),
-                      ),),
-                    ),),
-                    const SizedBox(height: 20),),
-                  ],),
-                ), );
-              ),  }
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
             ),
-          ),alButton(String iconPath, VoidCallback onTap, String label) {
+          ),
         ),
-      ),in with $label',
+      ),
     );
   }
-derRadius.circular(16),
+
   Widget _buildSocialButton(String iconPath, VoidCallback onTap, String label) {
-    return Tooltip(all(16),
+    return Tooltip(
       message: 'Sign in with $label',
-      child: InkWell(0]!),
-        onTap: onTap,borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        child: Container(e.asset(
+        child: Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(,
-            border: Border.all(color: Colors.grey[200]!),width: 32,
-            borderRadius: BorderRadius.circular(16),),
-          ),),
-          child: Image.asset(),
-            iconPath, );
-            height: 32, }
-            width: 32,}
-
-
-
-
-
-
-
-}  }    );      ),        ),          ),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey[200]!),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Image.asset(
+            iconPath,
+            height: 32,
+            width: 32,
+          ),
+        ),
+      ),
+    );
+  }
+}
