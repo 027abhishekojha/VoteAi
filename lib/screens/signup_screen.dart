@@ -149,11 +149,11 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                         const SizedBox(height: 32),
                         CustomButton(
                           text: 'Sign Up',
-                          onPressed: _handleSignUp,
-                          // onPressed: Navigator.pushReplacementNamed(
-                          //   context,
-                          //   '/home',
-                          // ),
+                          onPressed: () {
+                            if (!_isLoading) {
+                              Navigator.pushReplacementNamed(context, '/home');
+                            }
+                          },
                           isLoading: _isLoading,
                         ),
                       ],

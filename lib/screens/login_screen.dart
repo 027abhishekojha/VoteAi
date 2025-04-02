@@ -171,7 +171,11 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
                           const SizedBox(height: 32),
                           CustomButton(
                             text: 'Sign In',
-                            onPressed: _handleSignIn,
+                            onPressed: () {
+                              if (!_isLoading) {
+                                Navigator.pushReplacementNamed(context, '/home');
+                              }
+                            },
                             isLoading: _isLoading,
                           ),
                           const SizedBox(height: 24),

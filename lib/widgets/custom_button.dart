@@ -1,40 +1,8 @@
-// import 'package:flutter/material.dart';
-//
-// class CustomButton extends StatelessWidget {
-//   final String text;
-//   final VoidCallback onPressed;
-//   final bool isLoading;
-//
-//   const CustomButton({
-//     Key? key,
-//     required this.text,
-//     required this.onPressed,
-//     this.isLoading = false,
-//   }) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return ElevatedButton(
-//       onPressed: isLoading ? null : onPressed,
-//       child: isLoading
-//           ? const SizedBox(
-//               width: 20,
-//               height: 20,
-//               child: CircularProgressIndicator(
-//                 strokeWidth: 2,
-//                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-//               ),
-//             )
-//           : Text(text),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
   final double? width;
 
@@ -50,7 +18,7 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: width ?? double.infinity,
-      height: 45, // fixed height for consistency
+      height: 45,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         gradient: LinearGradient(
@@ -73,28 +41,28 @@ class CustomButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
-          onTap: isLoading ? null : onPressed,
+          onTap: isLoading || onPressed == null ? null : onPressed,
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: isLoading
                   ? const SizedBox(
-                height: 18,
-                width: 18,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
                   : Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-              ),
+                      text,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
             ),
           ),
         ),

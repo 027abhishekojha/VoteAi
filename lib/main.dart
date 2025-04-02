@@ -8,6 +8,8 @@ import 'screens/results_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/create_vote_screen.dart';
+import 'screens/verification_screen.dart';
+import 'screens/voting_region_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +33,9 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
         '/home': (context) => const HomeScreen(),
+        '/verify': (context) => const VerificationScreen(),
+        '/verification': (context) => const VerificationScreen(),
+        '/voting-region': (context) => const VotingRegionScreen(),
       },
     );
   }

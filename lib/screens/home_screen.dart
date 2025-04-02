@@ -201,7 +201,13 @@ class HomeScreen extends StatelessWidget {
         ),
         trailing: CustomButton(
           text: isLive ? 'Vote Now' : 'View Results',
-          onPressed: () {},
+          onPressed: () {
+            if (isLive) {
+              Navigator.pushNamed(context, '/verification');
+            } else {
+              Navigator.pushNamed(context, '/results');
+            }
+          },
           width: 120,
         ),
       ),
