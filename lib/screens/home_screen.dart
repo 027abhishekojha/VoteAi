@@ -130,7 +130,7 @@ class HomeScreen extends StatelessWidget {
         itemBuilder: (context, index) => _buildElectionCard(
           context,
           isLive: true,
-          title: 'Presidential Election 2024',
+          title: 'Presidential Election 2025',
           subtitle: 'Time Remaining: 2 days',
           candidates: '5 Candidates',
         ),
@@ -273,7 +273,7 @@ class HomeScreen extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          const Text('© 2024 AI Vote. All rights reserved.'),
+          const Text('© 2025 AI Vote. All rights reserved.'),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

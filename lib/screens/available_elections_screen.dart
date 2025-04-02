@@ -54,28 +54,31 @@ class AvailableElectionsScreen extends StatelessWidget {
   }
 
   Widget _buildElectionsList() {
-    // Dummy data for UI testing
-    final List<Map<String, String>> elections = [
-      {
-        'name': 'Mumbai Municipal Elections 2025',
-        'date': 'Voting Ends: April 10, 2025',
-        'status': 'Ongoing'
-      },
-      {
-        'name': 'Maharashtra State Assembly Elections',
-        'date': 'Voting Ends: April 15, 2025',
-        'status': 'Ongoing'
-      },
-    ];
+    return Builder(  // Wrap with Builder to get correct BuildContext
+      builder: (context) {
+        final List<Map<String, String>> elections = [
+          {
+            'name': 'Mumbai Municipal Elections 2025',
+            'date': 'Voting Ends: April 10, 2025',
+            'status': 'Ongoing'
+          },
+          {
+            'name': 'Maharashtra State Assembly Elections',
+            'date': 'Voting Ends: April 15, 2025',
+            'status': 'Ongoing'
+          },
+        ];
 
-    return Column(
-      children: elections
-          .map((election) => _buildElectionCard(election))
-          .toList(),
+        return Column(
+          children: elections
+              .map((election) => _buildElectionCard(context, election))  // Pass context
+              .toList(),
+        );
+      },
     );
   }
 
-  Widget _buildElectionCard(Map<String, String> election) {
+  Widget _buildElectionCard(BuildContext context, Map<String, String> election) {  // Added BuildContext parameter
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
@@ -127,15 +130,11 @@ class AvailableElectionsScreen extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                // CustomButton(
-                //   text: 'View Candidates',
-                //   onPressed: () => Navigator.pushNamed(
-                //     context,
-                //     '/candidates',
-                //     arguments: election,
-                //   ),
-                //   width: 150,
-                // ),
+                CustomButton(
+                  text: election['status'] == 'Ongoing' ? 'Cast Vote' : 'View Details',
+                  onPressed: () => _handleElectionTap(context, election),  // Move logic to separate method
+                  width: 120,
+                ),
               ],
             ),
           ],
@@ -143,4 +142,22 @@ class AvailableElectionsScreen extends StatelessWidget {
       ),
     );
   }
+
+  void _handleElectionTap(BuildContext context, Map<String, String> election) {
+    if (election['status'] == 'Ongoing') {
+      Navigator.of(context).pushNamed(  // Use Navigator.of(context)
+        '/candidates',
+        arguments: election,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('This election is not currently active'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
+  }
 }
+
+

@@ -1,4 +1,6 @@
 import 'package:aivote/screens/candidates_screen.dart';
+import 'package:aivote/screens/vote_confirmation_screen.dart';
+import 'package:aivote/screens/vote_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
@@ -30,6 +32,33 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       initialRoute: '/',
+      onGenerateRoute: (settings) {
+        if (settings.name == '/candidates') {
+          final args = settings.arguments as Map<String, String>?;
+          return MaterialPageRoute(
+            builder: (context) => CandidatesScreen(
+              election: args ?? {'error': 'No election data provided'},
+            ),
+          );
+        }
+        if (settings.name == '/vote-confirmation') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => VoteConfirmationScreen(
+              candidateData: args ?? {'error': 'No candidate data provided'},
+            ),
+          );
+        }
+        if (settings.name == '/vote-success') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => VoteSuccessScreen(
+              voteData: args ?? {'error': 'No vote data provided'},
+            ),
+          );
+        }
+        return null;
+      },
       routes: {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
@@ -39,10 +68,6 @@ class MyApp extends StatelessWidget {
         '/verification': (context) => const VerificationScreen(),
         '/voting-region': (context) => const VotingRegionScreen(),
         '/available-elections': (context) => const AvailableElectionsScreen(),
-        '/candidates': (context) {
-          final election = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
-          return CandidatesScreen(election: election);
-        },
       },
     );
   }

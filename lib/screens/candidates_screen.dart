@@ -121,19 +121,25 @@ class CandidatesScreen extends StatelessWidget {
             const SizedBox(height: 16),
             CustomButton(
               text: 'Vote for Candidate',
-              onPressed: () => Navigator.pushNamed(
-                context,
-                '/vote-confirmation',
-                arguments: {
-                  'election': election,
-                  'candidate': candidate,
-                },
-              ),
+              onPressed: () => _handleVoteSelection(context, candidate),
               width: double.infinity,
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _handleVoteSelection(BuildContext context, Map<String, dynamic> candidate) {
+    Navigator.pushNamed(
+      context,
+      '/vote-confirmation',
+      arguments: {
+        'name': candidate['name'] ?? 'Unknown',
+        'party': candidate['party'] ?? 'Unknown Party',
+        'manifesto': candidate['manifesto'] ?? 'No manifesto available',
+        'achievements': candidate['achievements'] ?? 'No achievements listed',
+      },
     );
   }
 }
