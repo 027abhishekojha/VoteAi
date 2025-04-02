@@ -1,3 +1,4 @@
+import 'package:aivote/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/vote_screen.dart';
@@ -21,7 +22,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const PagesPreview(),
+      // home: const PagesPreview(),
+      home: const LoginScreen(),
     );
   }
 }
