@@ -2,292 +2,510 @@ import 'package:flutter/material.dart';
 import '../widgets/custom_button.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'AI',
+                    style: TextStyle(
+                      fontFamily: 'Orbitron',
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Vote',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              // Show notifications
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.account_circle_outlined),
+            onPressed: () {
+              // Show profile
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildWelcomeCard(context),
+            const SizedBox(height: 24),
+            _buildQuickActions(context),
+            const SizedBox(height: 24),
+            _buildUpcomingElections(context),
+            const SizedBox(height: 24),
+            _buildVotingStatus(context),
+            const SizedBox(height: 24),
+            _buildSecurityInfo(context),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Show AI Assistant
+          _showAIAssistant(context);
+        },
+        child: Stack(
+          children: [
+            const Icon(Icons.smart_toy_outlined),
+            Positioned(
+              right: 0,
+              top: 0,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: 12,
+                  minHeight: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWelcomeCard(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildWelcomeBanner(context),
-            _buildLiveElectionsSection(context),
-            _buildPastElectionsSection(context),
-            _buildSecuritySection(context),
-            _buildHelpSection(context),
-            _buildFooter(context),
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  child: const Icon(Icons.person_outline, color: Colors.white),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome back, User',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      Text(
+                        'Your vote matters',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            CustomButton(
+              text: 'Cast Your Vote',
+              onPressed: () => Navigator.pushNamed(context, '/available-elections'),
+            ),
           ],
         ),
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      title: Row(
-        children: [
-          Container(
-            height: 40,
-            width: 40,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+  Widget _buildQuickActions(BuildContext context) {
+    final actions = [
+      {
+        'icon': Icons.how_to_vote_outlined,
+        'label': 'Available\nElections',
+        'route': '/available-elections',
+      },
+      {
+        'icon': Icons.verified_user_outlined,
+        'label': 'Identity\nVerification',
+        'route': '/verify',
+      },
+      {
+        'icon': Icons.history_outlined,
+        'label': 'Voting\nHistory',
+        'route': '/history',
+      },
+      {
+        'icon': Icons.bar_chart_outlined,
+        'label': 'Election\nResults',
+        'route': '/results',
+      },
+    ];
+
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      childAspectRatio: 1.5,
+      children: actions.map((action) {
+        return Card(
+          child: InkWell(
+            onTap: () => Navigator.pushNamed(context, action['route'] as String),
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    action['icon'] as IconData,
+                    size: 32,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    action['label'] as String,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          height: 1.2,
+                        ),
+                  ),
+                ],
               ),
-              borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.how_to_vote, color: Colors.white),
           ),
-          const SizedBox(width: 12),
-          const Text('AI Vote'),
-        ],
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.help_outline),
-          onPressed: () {},
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildUpcomingElections(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Upcoming Elections',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
         ),
-        PopupMenuButton(
-          icon: Container(
-            height: 35,
-            width: 35,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.person),
+        const SizedBox(height: 12),
+        Card(
+          child: ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 2,
+            separatorBuilder: (context, index) => const Divider(),
+            itemBuilder: (context, index) {
+              return ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.calendar_today_outlined,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                title: const Text('Mumbai Municipal Elections'),
+                subtitle: Text(
+                  'Starts in 2 days',
+                  style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {},
+              );
+            },
           ),
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'profile',
-              child: Text('Profile'),
-            ),
-            const PopupMenuItem(
-              value: 'logout',
-              child: Text('Logout'),
-            ),
-          ],
         ),
-        const SizedBox(width: 16),
       ],
     );
   }
 
-  Widget _buildWelcomeBanner(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary,
-            Theme.of(context).colorScheme.primaryContainer,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _buildVotingStatus(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Your Voting Status',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
         ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Welcome, User',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+        const SizedBox(height: 12),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _buildStatusItem(
+                  context,
+                  'Identity Verified',
+                  'Your identity has been verified',
+                  Icons.verified_outlined,
+                  Colors.green,
+                ),
+                const SizedBox(height: 16),
+                _buildStatusItem(
+                  context,
+                  'Region Confirmed',
+                  'Mumbai, Maharashtra',
+                  Icons.location_on_outlined,
+                  Colors.blue,
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Next Election: Presidential Election - Starts in 5 days',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white.withOpacity(0.9),
-            ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusItem(
+    BuildContext context,
+    String title,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
           ),
-          const SizedBox(height: 16),
-          CustomButton(
-            text: 'Register to Vote',
-            onPressed: () {},
-            width: 200,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLiveElectionsSection(BuildContext context) {
-    return _buildSection(
-      context,
-      'Live Elections',
-      ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: 2,
-        itemBuilder: (context, index) => _buildElectionCard(
-          context,
-          isLive: true,
-          title: 'Presidential Election 2025',
-          subtitle: 'Time Remaining: 2 days',
-          candidates: '5 Candidates',
+          child: Icon(icon, color: color),
         ),
-      ),
-    );
-  }
-
-  Widget _buildPastElectionsSection(BuildContext context) {
-    return _buildSection(
-      context,
-      'Past Elections',
-      ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: 2,
-        itemBuilder: (context, index) => _buildElectionCard(
-          context,
-          isLive: false,
-          title: 'Local Council Election 2023',
-          subtitle: 'Winner: John Doe',
-          candidates: 'Total Votes: 15,234',
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSection(BuildContext context, String title, Widget content) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          content,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildElectionCard(
-    BuildContext context, {
-    required bool isLive,
-    required String title,
-    required String subtitle,
-    required String candidates,
-  }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            Text(subtitle),
-            Text(candidates),
-          ],
-        ),
-        trailing: CustomButton(
-          text: isLive ? 'Vote Now' : 'View Results',
-          onPressed: () {
-            if (isLive) {
-              Navigator.pushNamed(context, '/verification');
-            } else {
-              Navigator.pushNamed(context, '/results');
-            }
-          },
-          width: 120,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSecuritySection(BuildContext context) {
-    return _buildSection(
-      context,
-      'Security & Transparency',
-      Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        const SizedBox(width: 12),
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Total Votes Cast: 25,678'),
-              const SizedBox(height: 8),
-              CustomButton(
-                text: 'Verify on Blockchain',
-                onPressed: () {},
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                    ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildHelpSection(BuildContext context) {
-    return _buildSection(
-      context,
-      'Help & Support',
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildHelpButton(context, Icons.help, 'FAQ'),
-          _buildHelpButton(context, Icons.support_agent, 'Support'),
-          _buildHelpButton(context, Icons.play_circle, 'Tutorial'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHelpButton(BuildContext context, IconData icon, String label) {
-    return Column(
-      children: [
-        IconButton(
-          icon: Icon(icon),
-          onPressed: () {},
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.grey[200],
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(label),
       ],
     );
   }
 
-  Widget _buildFooter(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          const Text('© 2025 AI Vote. All rights reserved.'),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildSecurityInfo(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.security_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Security Information',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Your vote is secured by blockchain technology and protected by AI-powered fraud detection.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAIAssistant(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.5,
+          minChildSize: 0.3,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.smart_toy_outlined,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'AI Assistant',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Text(
+                              'How can I help you today?',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Expanded(
+                    child: ListView(
+                      controller: scrollController,
+                      children: [
+                        _buildAssistantOption(
+                          context,
+                          'How to Vote',
+                          'Learn about the voting process',
+                          Icons.how_to_vote_outlined,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildAssistantOption(
+                          context,
+                          'Verify Identity',
+                          'Get help with identity verification',
+                          Icons.verified_user_outlined,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildAssistantOption(
+                          context,
+                          'Track Vote',
+                          'Check your vote status',
+                          Icons.track_changes_outlined,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildAssistantOption(
+    BuildContext context,
+    String title,
+    String subtitle,
+    IconData icon,
+  ) {
+    return Card(
+      child: InkWell(
+        onTap: () {},
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
             children: [
-              TextButton(
-                onPressed: () {},
-                child: const Text('Privacy Policy'),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
               ),
-              TextButton(
-                onPressed: () {},
-                child: const Text('Terms of Use'),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                    ),
+                  ],
+                ),
               ),
+              const Icon(Icons.chevron_right),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
