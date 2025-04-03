@@ -30,13 +30,13 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildWelcomeCard(context),
-              const SizedBox(height: 24),
+              const SizedBox(height: 25),
               _buildActiveElectionCard(context),
-              const SizedBox(height: 24),
+              const SizedBox(height: 25),
               _buildQuickActions(context),
-              const SizedBox(height: 24),
+              const SizedBox(height: 25),
               _buildVotingStatus(context),
-              const SizedBox(height: 24),
+              const SizedBox(height: 25),
               _buildSecurityInfo(context),
             ],
           ),
@@ -195,51 +195,61 @@ class _HomeScreenState extends State<HomeScreen> {
       {
         'icon': Icons.history_outlined,
         'label': 'Voting\nHistory',
-        'route': '/history',
+        'route': '/voting-history',
       },
       {
         'icon': Icons.bar_chart_outlined,
         'label': 'Election\nResults',
-        'route': '/results',
+        'route': '/election-results',
       },
     ];
 
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      mainAxisSpacing: 16,
-      crossAxisSpacing: 16,
-      childAspectRatio: 1.5,
-      children: actions.map((action) {
-        return Card(
-          child: InkWell(
-            onTap: () => Navigator.pushNamed(context, action['route'] as String),
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    action['icon'] as IconData,
-                    size: 32,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    action['label'] as String,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          height: 1.2,
-                        ),
-                  ),
-                ],
+    // Calculate the grid item height based on screen size
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = (screenWidth - (48 + 16)) / 2; // Account for padding and spacing
+    final itemHeight = itemWidth / 1.5; // Maintain 1.5 aspect ratio
+
+    return SizedBox(
+      height: (itemHeight * 2) + 16, // Total height for 2 rows + spacing
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 1.5,
+        children: actions.map((action) {
+          return Card(
+            margin: EdgeInsets.zero, // Remove default card margin
+            child: InkWell(
+              onTap: () => Navigator.pushNamed(context, action['route'] as String),
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(12), // Reduced padding
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      action['icon'] as IconData,
+                      size: 28, // Slightly reduced icon size
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(height: 4), // Reduced spacing
+                    Text(
+                      action['label'] as String,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            height: 1.1, // Reduced line height
+                            fontSize: 13, // Slightly smaller text
+                          ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 
