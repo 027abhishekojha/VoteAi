@@ -101,12 +101,12 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
         Stack(
           alignment: Alignment.center,
           children: [
-            // Neural network background effect
+            // Animated circuit pattern background
             Container(
-              width: 140,
-              height: 140,
+              width: 160,
+              height: 160,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(35),
+                borderRadius: BorderRadius.circular(40),
                 gradient: LinearGradient(
                   colors: [
                     Theme.of(context).colorScheme.primary.withOpacity(0.1),
@@ -117,15 +117,15 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
                 ),
               ),
               child: CustomPaint(
-                painter: NeuralNetworkPainter(
+                painter: CircuitPatternPainter(
                   color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                 ),
               ),
             ),
             // Main logo container
             Container(
-              width: 120,
-              height: 120,
+              width: 140,
+              height: 140,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -135,7 +135,7 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(35),
                 boxShadow: [
                   BoxShadow(
                     color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
@@ -144,44 +144,60 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.how_to_vote_rounded,
-                size: 60,
-                color: Colors.white,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // AI Text with neon effect
+                  Positioned(
+                    left: 20,
+                    child: Text(
+                      'AI',
+                      style: TextStyle(
+                        fontFamily: 'Orbitron', // You'll need to add this font
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        foreground: Paint()
+                          ..shader = LinearGradient(
+                            colors: [
+                              Colors.white,
+                              Colors.white.withOpacity(0.8),
+                            ],
+                          ).createShader(const Rect.fromLTWH(0, 0, 50, 40)),
+                        shadows: [
+                          Shadow(
+                            color: Colors.white.withOpacity(0.8),
+                            blurRadius: 15,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Vote icon
+                  const Positioned(
+                    right: 20,
+                    child: Icon(
+                      Icons.how_to_vote_rounded,
+                      size: 48,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
         const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'AI ',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    foreground: Paint()
-                      ..shader = LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.secondary,
-                        ],
-                      ).createShader(const Rect.fromLTWH(0, 0, 50, 30)),
-                  ),
-            ),
-            Text(
-              'Vote',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
         Text(
-          'Secure Voting with Intelligence',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.grey[600],
+          'Secure Voting with AI',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                foreground: Paint()
+                  ..shader = LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.secondary,
+                    ],
+                  ).createShader(const Rect.fromLTWH(0, 0, 200, 40)),
               ),
         ),
       ],
@@ -300,6 +316,56 @@ class NeuralNetworkPainter extends CustomPainter {
             paint,
           );
         }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Add this custom painter class for the circuit pattern
+class CircuitPatternPainter extends CustomPainter {
+  final Color color;
+
+  CircuitPatternPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    final double spacing = size.width / 8;
+    
+    // Draw horizontal and vertical lines
+    for (var i = 1; i < 8; i++) {
+      // Horizontal lines with dots
+      if (i % 2 == 0) {
+        canvas.drawLine(
+          Offset(0, i * spacing),
+          Offset(size.width, i * spacing),
+          paint,
+        );
+        
+        // Add connection dots
+        for (var j = 1; j < 8; j += 2) {
+          canvas.drawCircle(
+            Offset(j * spacing, i * spacing),
+            2,
+            Paint()..color = color,
+          );
+        }
+      }
+      
+      // Vertical lines with dots
+      if (i % 2 == 0) {
+        canvas.drawLine(
+          Offset(i * spacing, 0),
+          Offset(i * spacing, size.height),
+          paint,
+        );
       }
     }
   }
