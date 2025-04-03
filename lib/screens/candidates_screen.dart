@@ -133,7 +133,7 @@ class CandidatesScreen extends StatelessWidget {
   void _handleVoteSelection(BuildContext context, Map<String, dynamic> candidate) {
     Navigator.pushNamed(
       context,
-      '/vote-confirmation',
+      '/otp-verification',
       arguments: {
         'name': candidate['name'] ?? 'Unknown',
         'party': candidate['party'] ?? 'Unknown Party',

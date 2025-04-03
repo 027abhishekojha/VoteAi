@@ -1,5 +1,8 @@
 import 'package:aivote/screens/candidates_screen.dart';
+import 'package:aivote/screens/otp_verification_screen.dart';
+import 'package:aivote/screens/pending_results_screen.dart';
 import 'package:aivote/screens/vote_confirmation_screen.dart';
+import 'package:aivote/screens/vote_result_summary_screen.dart';
 import 'package:aivote/screens/vote_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/splash_screen.dart';
@@ -57,6 +60,14 @@ class MyApp extends StatelessWidget {
             ),
           );
         }
+        if (settings.name == '/otp-verification') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => OtpVerificationScreen(
+              candidateData: args ?? {'error': 'No candidate data provided'},
+            ),
+          );
+        }
         return null;
       },
       routes: {
@@ -68,6 +79,14 @@ class MyApp extends StatelessWidget {
         '/verification': (context) => const VerificationScreen(),
         '/voting-region': (context) => const VotingRegionScreen(),
         '/available-elections': (context) => const AvailableElectionsScreen(),
+        '/vote-result-summary': (context) => const VoteResultSummaryScreen(),
+        '/pending-results': (context) => const PendingResultsScreen(),
+        '/vote-success': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+          return VoteSuccessScreen(
+            voteData: args ?? {'error': 'No vote data provided'},
+          );
+        },
       },
     );
   }
