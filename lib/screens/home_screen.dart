@@ -1,103 +1,102 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_button.dart';
+import '../widgets/countdown_timer.dart';
+import '../widgets/notification_badge.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final int _unreadNotifications = 2;
+  bool _isIdentityVerified = true;
+  String _userName = 'John Doe';
+  String _userRegion = 'Mumbai, Maharashtra';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
+      appBar: _buildAppBar(context),
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildWelcomeCard(context),
+              const SizedBox(height: 24),
+              _buildActiveElectionCard(context),
+              const SizedBox(height: 24),
+              _buildQuickActions(context),
+              const SizedBox(height: 24),
+              _buildVotingStatus(context),
+              const SizedBox(height: 24),
+              _buildSecurityInfo(context),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: _buildAIAssistantButton(context),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ShaderMask(
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.secondary,
+                    ],
+                  ).createShader(bounds),
+                  child: const Text(
                     'AI',
                     style: TextStyle(
                       fontFamily: 'Orbitron',
-                      color: Theme.of(context).colorScheme.primary,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Vote',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Vote',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              // Show notifications
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () {
-              // Show profile
-            },
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildWelcomeCard(context),
-            const SizedBox(height: 24),
-            _buildQuickActions(context),
-            const SizedBox(height: 24),
-            _buildUpcomingElections(context),
-            const SizedBox(height: 24),
-            _buildVotingStatus(context),
-            const SizedBox(height: 24),
-            _buildSecurityInfo(context),
-          ],
+      actions: [
+        NotificationBadge(
+          count: _unreadNotifications,
+          onTap: () => _showNotifications(context),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Show AI Assistant
-          _showAIAssistant(context);
-        },
-        child: Stack(
-          children: [
-            const Icon(Icons.smart_toy_outlined),
-            Positioned(
-              right: 0,
-              top: 0,
-              child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                constraints: const BoxConstraints(
-                  minWidth: 12,
-                  minHeight: 12,
-                ),
-              ),
-            ),
-          ],
+        IconButton(
+          icon: const Icon(Icons.account_circle_outlined),
+          onPressed: () => _showProfile(context),
         ),
-      ),
+      ],
     );
   }
 
@@ -120,7 +119,7 @@ class HomeScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Welcome back, User',
+                        'Welcome back, $_userName',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       Text(
@@ -141,6 +140,42 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildActiveElectionCard(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            title: Row(
+              children: [
+                Icon(
+                  Icons.how_to_vote_outlined,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                const Text('Active Election'),
+                const Spacer(),
+                CountdownTimer(
+                  endTime: DateTime.now().add(const Duration(days: 2)),
+                ),
+              ],
+            ),
+            subtitle: const Text('Mumbai Municipal Elections 2025'),
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: CustomButton(
+              text: 'Cast Your Vote Now',
+              onPressed: _isIdentityVerified
+                  ? () => Navigator.pushNamed(context, '/available-elections')
+                  : () => Navigator.pushNamed(context, '/verify'),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -208,51 +243,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildUpcomingElections(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          'Upcoming Elections',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        const SizedBox(height: 12),
-        Card(
-          child: ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 2,
-            separatorBuilder: (context, index) => const Divider(),
-            itemBuilder: (context, index) {
-              return ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.calendar_today_outlined,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                title: const Text('Mumbai Municipal Elections'),
-                subtitle: Text(
-                  'Starts in 2 days',
-                  style: TextStyle(color: Theme.of(context).colorScheme.primary),
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildVotingStatus(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -280,7 +270,7 @@ class HomeScreen extends StatelessWidget {
                 _buildStatusItem(
                   context,
                   'Region Confirmed',
-                  'Mumbai, Maharashtra',
+                  _userRegion,
                   Icons.location_on_outlined,
                   Colors.blue,
                 ),
@@ -360,6 +350,32 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _handleRefresh() async {
+    // Simulate refresh
+    await Future.delayed(const Duration(seconds: 1));
+    if (mounted) {
+      setState(() {
+        // Update data
+      });
+    }
+  }
+
+  void _showNotifications(BuildContext context) {
+    Navigator.pushNamed(context, '/notifications');
+  }
+
+  void _showProfile(BuildContext context) {
+    Navigator.pushNamed(context, '/profile');
+  }
+
+  Widget _buildAIAssistantButton(BuildContext context) {
+    return FloatingActionButton.extended(
+      onPressed: () => _showAIAssistant(context),
+      label: const Text('AI Assistant'),
+      icon: const Icon(Icons.smart_toy_outlined),
     );
   }
 

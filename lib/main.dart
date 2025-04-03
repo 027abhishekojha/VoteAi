@@ -17,6 +17,10 @@ import 'screens/create_vote_screen.dart';
 import 'screens/verification_screen.dart';
 import 'screens/voting_region_screen.dart';
 import 'screens/available_elections_screen.dart';
+import 'screens/notifications_screen.dart';
+import 'screens/voting_history_screen.dart';
+import 'screens/election_results_screen.dart';
+import 'screens/security_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +37,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
         useMaterial3: true,
+        // Add custom font
+        fontFamily: 'Poppins',
       ),
       initialRoute: '/',
       onGenerateRoute: (settings) {
@@ -87,6 +93,11 @@ class MyApp extends StatelessWidget {
             voteData: args ?? {'error': 'No vote data provided'},
           );
         },
+        '/notifications': (context) => const NotificationsScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/voting-history': (context) => const VotingHistoryScreen(),
+        '/election-results': (context) => const ElectionResultsScreen(),
+        '/security': (context) => const SecurityScreen(),
       },
     );
   }
