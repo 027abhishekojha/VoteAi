@@ -1,5 +1,6 @@
+import 'package:aivote/screens/Phone_login_otp_screen.dart';
 import 'package:aivote/screens/candidates_screen.dart';
-import 'package:aivote/screens/otp_verification_screen.dart';
+// import 'package:aivote/screens/otp_verification_screen.dart';
 import 'package:aivote/screens/pending_results_screen.dart';
 import 'package:aivote/screens/vote_confirmation_screen.dart';
 import 'package:aivote/screens/vote_result_summary_screen.dart';
@@ -21,6 +22,8 @@ import 'screens/notifications_screen.dart';
 import 'screens/voting_history_screen.dart';
 import 'screens/election_results_screen.dart';
 import 'screens/security_screen.dart';
+import 'screens/new_otp_verification_screen.dart';
+// import 'screens/phone_login_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,57 +45,64 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       onGenerateRoute: (settings) {
-        if (settings.name == '/candidates') {
-          final args = settings.arguments as Map<String, String>?;
-          return MaterialPageRoute(
-            builder: (context) => CandidatesScreen(
-              election: args ?? {'error': 'No election data provided'},
-            ),
-          );
+        switch (settings.name) {
+          case '/candidates':
+            final args = settings.arguments as Map<String, String>?;
+            return MaterialPageRoute(
+              builder: (context) => CandidatesScreen(
+                election: args ?? {'error': 'No election data provided'},
+              ),
+            );
+          
+          case '/vote-confirmation':
+            final args = settings.arguments as Map<String, dynamic>?;
+            return MaterialPageRoute(
+              builder: (context) => VoteConfirmationScreen(
+                candidateData: args ?? {'error': 'No candidate data provided'},
+              ),
+            );
+          
+          case '/vote-success':
+            final args = settings.arguments as Map<String, dynamic>?;
+            return MaterialPageRoute(
+              builder: (context) => VoteSuccessScreen(
+                voteData: args ?? {'error': 'No vote data provided'},
+              ),
+            );
+          
+          case '/otp-verification':
+            // Handle OTP verification with phone number
+            final phoneNumber = settings.arguments as String?;
+            return MaterialPageRoute(
+              builder: (context) => NewOtpVerificationScreen(  // Updated this line
+                phoneNumber: phoneNumber ?? '',
+              ),
+            );
+          
+          case '/verification-process':
+            // Add any verification data you want to pass
+            return MaterialPageRoute(
+              builder: (context) => const VerificationScreen(),
+            );
+          
+          default:
+            return null;
         }
-        if (settings.name == '/vote-confirmation') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (context) => VoteConfirmationScreen(
-              candidateData: args ?? {'error': 'No candidate data provided'},
-            ),
-          );
-        }
-        if (settings.name == '/vote-success') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (context) => VoteSuccessScreen(
-              voteData: args ?? {'error': 'No vote data provided'},
-            ),
-          );
-        }
-        if (settings.name == '/otp-verification') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (context) => OtpVerificationScreen(
-              candidateData: args ?? {'error': 'No candidate data provided'},
-            ),
-          );
-        }
-        return null;
       },
       routes: {
         '/': (context) => const SplashScreen(),
+        '/phone-login': (context) => const PhoneLoginScreen(),
+        '/verification': (context) => const VerificationScreen(),
+        '/verify': (context) => const VerificationScreen(),
+        // '/verification': (context) => const VerificationScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
         '/home': (context) => const HomeScreen(),
-        '/verify': (context) => const VerificationScreen(),
-        '/verification': (context) => const VerificationScreen(),
+        // '/verify': (context) => const VerificationScreen(),
         '/voting-region': (context) => const VotingRegionScreen(),
         '/available-elections': (context) => const AvailableElectionsScreen(),
         '/vote-result-summary': (context) => const VoteResultSummaryScreen(),
         '/pending-results': (context) => const PendingResultsScreen(),
-        '/vote-success': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
-          return VoteSuccessScreen(
-            voteData: args ?? {'error': 'No vote data provided'},
-          );
-        },
         '/notifications': (context) => const NotificationsScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/voting-history': (context) => const VotingHistoryScreen(),
