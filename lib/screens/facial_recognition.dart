@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import '../../widgets/custom_button.dart';
@@ -136,8 +138,8 @@ class _FacialRecognitionScreenState extends State<FacialRecognitionScreen> {
     return Column(
       children: [
         Expanded(
-          child: Image.asset(
-            _imagePath!,
+          child: Image.file(
+            File(_imagePath!),
             fit: BoxFit.contain,
           ),
         ),
