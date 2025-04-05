@@ -87,8 +87,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
     return Column(
       children: [
         // Facial Recognition Card
-        GestureDetector(
-          onTap: _isFacialRecognitionDone ? null : () => _startFacialRecognition(context),
+        InkWell(  // Changed from GestureDetector to InkWell for better touch feedback
+          onTap: _isFacialRecognitionDone 
+              ? null 
+              : () => _startFacialRecognition(context),
           child: _buildVerificationCard(
             title: 'Facial Recognition',
             subtitle: _isFacialRecognitionDone 
@@ -96,14 +98,17 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 : 'Take a clear selfie for verification',
             icon: Icons.face_outlined,
             isDone: _isFacialRecognitionDone,
+            isEnabled: true,
           ),
         ),
         const SizedBox(height: 16),
         // Document Verification Card
-        GestureDetector(
-          onTap: !_isFacialRecognitionDone || _isDocumentVerificationDone 
-              ? null 
-              : () => _startDocumentVerification(context),
+        InkWell(  // Changed from GestureDetector to InkWell
+          onTap: () {
+            if (_isFacialRecognitionDone && !_isDocumentVerificationDone) {
+              _startDocumentVerification(context);
+            }
+          },
           child: _buildVerificationCard(
             title: 'Document Verification',
             subtitle: _isDocumentVerificationDone 
@@ -128,60 +133,73 @@ class _VerificationScreenState extends State<VerificationScreen> {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 4),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: isDone 
-              ? Colors.green.withOpacity(0.1)
-              : !isEnabled 
-                  ? Colors.grey.withOpacity(0.1)
-                  : Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                isDone ? Icons.check_circle : icon,
-                color: isDone 
-                    ? Colors.green
-                    : !isEnabled 
-                        ? Colors.grey
-                        : Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+      child: Opacity(
+        opacity: isEnabled ? 1.0 : 0.6,  // Added opacity for disabled state
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: isDone 
+                ? Colors.green.withOpacity(0.1)
+                : !isEnabled 
+                    ? Colors.grey.withOpacity(0.1)
+                    : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDone 
+                        ? Colors.green
+                        : !isEnabled 
+                            ? Colors.grey
+                            : Theme.of(context).colorScheme.primary,
+                    width: 1,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                  ),
-                ],
+                ),
+                child: Icon(
+                  isDone ? Icons.check_circle : icon,
+                  color: isDone 
+                      ? Colors.green
+                      : !isEnabled 
+                          ? Colors.grey
+                          : Theme.of(context).colorScheme.primary,
+                ),
               ),
-            ),
-            if (!isDone && isEnabled)
-              Icon(
-                Icons.arrow_forward_ios,
-                color: Theme.of(context).colorScheme.primary,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: !isEnabled ? Colors.grey : null,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: !isEnabled ? Colors.grey : Colors.grey[600],
+                          ),
+                    ),
+                  ],
+                ),
               ),
-          ],
+              if (!isDone && isEnabled)
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+            ],
+          ),
         ),
       ),
     );

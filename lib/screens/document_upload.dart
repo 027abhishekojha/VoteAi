@@ -10,25 +10,33 @@ class DocumentUploadScreen extends StatefulWidget {
 }
 
 class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
-  String? _selectedDocType;
-  String? _imagePath;
+  final Map<String, String?> _uploadedDocuments = {
+    'voter_id': null,
+    'aadhaar': null,
+    'pan': null,
+  };
+  
+  int _currentStep = 0;
   bool _isLoading = false;
 
-  final List<Map<String, dynamic>> _documentTypes = [
+  final List<Map<String, dynamic>> _documentSteps = [
     {
       'type': 'voter_id',
       'name': 'Voter ID',
       'icon': Icons.how_to_vote_outlined,
+      'hint': 'Upload your Voter ID card',
     },
     {
       'type': 'aadhaar',
       'name': 'Aadhaar Card',
       'icon': Icons.credit_card_outlined,
+      'hint': 'Upload your Aadhaar card',
     },
     {
       'type': 'pan',
       'name': 'PAN Card',
       'icon': Icons.account_balance_outlined,
+      'hint': 'Upload your PAN card',
     },
   ];
 
@@ -36,7 +44,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upload Document'),
+        title: const Text('Upload Documents'),
       ),
       body: Stack(
         children: [
@@ -45,12 +53,16 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildHeader(context),
+                _buildStepIndicator(),
                 const SizedBox(height: 32),
-                _buildDocumentTypeSelector(context),
-                if (_selectedDocType != null) ...[
+                _buildCurrentStep(),
+                if (_allDocumentsUploaded()) ...[
                   const SizedBox(height: 32),
-                  _buildUploadSection(context),
+                  CustomButton(
+                    text: 'Submit All Documents',
+                    onPressed: _submitDocuments,
+                    isLoading: _isLoading,
+                  ),
                 ],
               ],
             ),
@@ -67,130 +79,150 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Column(
-      children: [
-        Icon(
-          Icons.upload_file_outlined,
-          size: 64,
-          color: Theme.of(context).colorScheme.primary,
+  Widget _buildStepIndicator() {
+    return Row(
+      children: List.generate(
+        _documentSteps.length,
+        (index) => Expanded(
+          child: Container(
+            height: 4,
+            margin: const EdgeInsets.symmetric(horizontal: 2),
+            decoration: BoxDecoration(
+              color: index <= _currentStep
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
         ),
-        const SizedBox(height: 16),
+      ),
+    );
+  }
+
+  Widget _buildCurrentStep() {
+    final currentDoc = _documentSteps[_currentStep];
+    final docType = currentDoc['type'] as String;
+    final isUploaded = _uploadedDocuments[docType] != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
         Text(
-          'Upload Your Government Document',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+          'Step ${_currentStep + 1} of ${_documentSteps.length}',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Colors.grey[600],
               ),
-          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
-          'Please select your document type and upload a clear photo',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.grey[600],
+          'Upload ${currentDoc['name']}',
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
-          textAlign: TextAlign.center,
         ),
+        const SizedBox(height: 24),
+        if (!isUploaded)
+          _buildUploadCard(currentDoc)
+        else
+          _buildUploadedPreview(currentDoc),
+        const SizedBox(height: 24),
+        if (isUploaded && _currentStep < _documentSteps.length - 1)
+          CustomButton(
+            text: 'Continue to Next Document',
+            onPressed: () {
+              setState(() => _currentStep++);
+            },
+          ),
       ],
     );
   }
 
-  Widget _buildDocumentTypeSelector(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: _documentTypes.map((doc) {
-        final bool isSelected = _selectedDocType == doc['type'];
-        
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          color: isSelected
-              ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
-              : null,
-          child: InkWell(
-            onTap: () {
-              setState(() => _selectedDocType = doc['type']);
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(
-                    doc['icon'],
-                    color: isSelected
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    doc['name'],
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : null,
-                        ),
-                  ),
-                  const Spacer(),
-                  if (isSelected)
-                    Icon(
-                      Icons.check_circle,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildUploadSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (_imagePath == null)
-          CustomButton(
-            text: 'Upload Document',
-            onPressed: _showImageSourceDialog,
-            isLoading: _isLoading,
-          )
-        else ...[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              _imagePath!,
-              height: 200,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
+  Widget _buildUploadCard(Map<String, dynamic> doc) {
+    return Card(
+      child: InkWell(
+        onTap: () => _showImageSourceDialog(doc['type']),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
             children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _isLoading ? null : () {
-                    setState(() => _imagePath = null);
-                  },
-                  child: const Text('Replace'),
-                ),
+              Icon(
+                doc['icon'] as IconData,
+                size: 48,
+                color: Theme.of(context).colorScheme.primary,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: CustomButton(
-                  text: 'Confirm & Upload',
-                  onPressed: _uploadDocument,
-                  isLoading: _isLoading,
-                ),
+              const SizedBox(height: 16),
+              Text(
+                doc['hint'] as String,
+                style: Theme.of(context).textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Tap to upload',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[600],
+                    ),
               ),
             ],
           ),
-        ],
-      ],
+        ),
+      ),
     );
   }
 
-  void _showImageSourceDialog() {
+  Widget _buildUploadedPreview(Map<String, dynamic> doc) {
+    final docType = doc['type'] as String;
+    
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.check_circle,
+                color: Colors.green,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    doc['name'] as String,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Text(
+                    'Document uploaded successfully',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                setState(() => _uploadedDocuments[docType] = null);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showImageSourceDialog(String docType) {
     showModalBottomSheet(
       context: context,
       builder: (context) => Column(
@@ -201,7 +233,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
             title: const Text('Take Photo'),
             onTap: () {
               Navigator.pop(context);
-              _pickImage(ImageSource.camera);
+              _pickImage(ImageSource.camera, docType);
             },
           ),
           ListTile(
@@ -209,7 +241,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
             title: const Text('Choose from Gallery'),
             onTap: () {
               Navigator.pop(context);
-              _pickImage(ImageSource.gallery);
+              _pickImage(ImageSource.gallery, docType);
             },
           ),
         ],
@@ -217,13 +249,13 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     );
   }
 
-  Future<void> _pickImage(ImageSource source) async {
+  Future<void> _pickImage(ImageSource source, String docType) async {
     final picker = ImagePicker();
     
     try {
       final image = await picker.pickImage(source: source);
       if (image != null) {
-        setState(() => _imagePath = image.path);
+        setState(() => _uploadedDocuments[docType] = image.path);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -232,13 +264,23 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     }
   }
 
-  Future<void> _uploadDocument() async {
+  bool _allDocumentsUploaded() {
+    return !_uploadedDocuments.values.contains(null);
+  }
+
+  Future<void> _submitDocuments() async {
     setState(() => _isLoading = true);
     
     // Simulate API call
     await Future.delayed(const Duration(seconds: 2));
     
     if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Documents uploaded successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
       Navigator.pop(context, true);
     }
   }
