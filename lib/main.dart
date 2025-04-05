@@ -1,29 +1,29 @@
-import 'package:aivote/screens/Phone_login_otp_screen.dart';
-import 'package:aivote/screens/candidates_screen.dart';
-// import 'package:aivote/screens/otp_verification_screen.dart';
-import 'package:aivote/screens/pending_results_screen.dart';
-import 'package:aivote/screens/vote_confirmation_screen.dart';
-import 'package:aivote/screens/vote_result_summary_screen.dart';
-import 'package:aivote/screens/vote_success_screen.dart';
+import 'package:aivote/screens/create_vote_screen.dart';
+import 'package:aivote/screens/results_screen.dart';
+import 'package:aivote/screens/settings_screen.dart';
+import 'package:aivote/screens/vote_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/splash_screen.dart';
+import 'screens/phone_login_otp_screen.dart';
+import 'screens/verification_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/vote_screen.dart';
-import 'screens/results_screen.dart';
-import 'screens/profile_screen.dart';
-import 'screens/settings_screen.dart';
-import 'screens/create_vote_screen.dart';
-import 'screens/verification_screen.dart';
 import 'screens/voting_region_screen.dart';
 import 'screens/available_elections_screen.dart';
+import 'screens/vote_result_summary_screen.dart';
+import 'screens/pending_results_screen.dart';
 import 'screens/notifications_screen.dart';
+import 'screens/profile_screen.dart';
 import 'screens/voting_history_screen.dart';
 import 'screens/election_results_screen.dart';
 import 'screens/security_screen.dart';
+import 'screens/facial_recognition.dart';
+import 'screens/document_upload.dart';
 import 'screens/new_otp_verification_screen.dart';
-// import 'screens/phone_login_screen.dart';
+import 'package:aivote/screens/candidates_screen.dart';
+import 'package:aivote/screens/vote_confirmation_screen.dart';
+import 'package:aivote/screens/vote_success_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,10 +40,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
         useMaterial3: true,
-        // Add custom font
         fontFamily: 'Poppins',
       ),
       initialRoute: '/',
+      // Handle dynamic routes
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/candidates':
@@ -71,34 +71,70 @@ class MyApp extends StatelessWidget {
             );
           
           case '/otp-verification':
-            // Handle OTP verification with phone number
             final phoneNumber = settings.arguments as String?;
             return MaterialPageRoute(
-              builder: (context) => NewOtpVerificationScreen(  // Updated this line
+              builder: (context) => NewOtpVerificationScreen(
                 phoneNumber: phoneNumber ?? '',
               ),
             );
           
-          case '/verification-process':
-            // Add any verification data you want to pass
+          case '/verification':
             return MaterialPageRoute(
               builder: (context) => const VerificationScreen(),
             );
           
-          default:
-            return null;
+          case '/facial-recognition':
+            return MaterialPageRoute(
+              builder: (context) => const FacialRecognitionScreen(),
+            );
+          
+          case '/document-upload':
+            return MaterialPageRoute(
+              builder: (context) => const DocumentUploadScreen(),
+            );
         }
+        return null;
       },
+      // Handle unknown routes
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(
+              title: const Text('Page Not Found'),
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Route "${settings.name}" not found',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+                    child: const Text('Go to Home'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      // Static routes
       routes: {
         '/': (context) => const SplashScreen(),
         '/phone-login': (context) => const PhoneLoginScreen(),
         '/verification': (context) => const VerificationScreen(),
-        '/verify': (context) => const VerificationScreen(),
-        // '/verification': (context) => const VerificationScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
         '/home': (context) => const HomeScreen(),
-        // '/verify': (context) => const VerificationScreen(),
         '/voting-region': (context) => const VotingRegionScreen(),
         '/available-elections': (context) => const AvailableElectionsScreen(),
         '/vote-result-summary': (context) => const VoteResultSummaryScreen(),
@@ -108,6 +144,11 @@ class MyApp extends StatelessWidget {
         '/voting-history': (context) => const VotingHistoryScreen(),
         '/election-results': (context) => const ElectionResultsScreen(),
         '/security': (context) => const SecurityScreen(),
+        '/facial-recognition': (context) => const FacialRecognitionScreen(),
+        '/document-upload': (context) => const DocumentUploadScreen(),
+        '/create-vote': (context) => const CreateVoteScreen(),
+        '/results': (context) => const ResultsScreen(),
+        '/settings': (context) => const SettingsScreen(),
       },
     );
   }
@@ -158,6 +199,11 @@ class PagesPreview extends StatelessWidget {
         'title': 'Signup Page',
         'icon': Icons.login,
         'widget': const SignupScreen(),
+      },
+      {
+        'title': 'Facial Recognition',
+        'icon': Icons.face,
+        'widget': const FacialRecognitionScreen(),
       },
     ];
 

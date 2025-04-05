@@ -68,11 +68,14 @@ class _NewOtpVerificationScreenState extends State<NewOtpVerificationScreen> {
     }
 
     setState(() => _isLoading = true);
+
+    // Simulate API call
     await Future.delayed(const Duration(seconds: 2));
 
     if (_enteredOtp == _dummyOtp) {
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/verification-process');
+        // Change this line to navigate to verification screen
+        Navigator.pushReplacementNamed(context, '/verification');
       }
     } else {
       if (mounted) {
