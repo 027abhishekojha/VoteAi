@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import '../widgets/custom_button.dart';
+
 
 class DocumentUploadScreen extends StatefulWidget {
   const DocumentUploadScreen({Key? key}) : super(key: key);
@@ -16,6 +19,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     'pan': null,
   };
   
+  // String? _imagePath;  // Add this line
   int _currentStep = 0;
   bool _isLoading = false;
 
@@ -80,6 +84,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
   }
 
   Widget _buildStepIndicator() {
+    final theme = Theme.of(context);
     return Row(
       children: List.generate(
         _documentSteps.length,
@@ -89,7 +94,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 2),
             decoration: BoxDecoration(
               color: index <= _currentStep
-                  ? Theme.of(context).colorScheme.primary
+                  ? theme.colorScheme.primary
                   : Colors.grey[300],
               borderRadius: BorderRadius.circular(2),
             ),
@@ -173,52 +178,65 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
 
   Widget _buildUploadedPreview(Map<String, dynamic> doc) {
     final docType = doc['type'] as String;
+    final imagePath = _uploadedDocuments[docType];
     
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.check_circle,
-                color: Colors.green,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    doc['name'] as String,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  Text(
-                    'Document uploaded successfully',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () {
-                setState(() => _uploadedDocuments[docType] = null);
-              },
-            ),
-          ],
+    if (imagePath == null) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: _buildSafeImageFromFile(imagePath),
         ),
-      ),
+        const SizedBox(height: 16),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        doc['name'] as String,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      Text(
+                        'Document uploaded successfully',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey[600],
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () {
+                    setState(() => _uploadedDocuments[docType] = null);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -249,18 +267,119 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     );
   }
 
+  Widget _buildUploadSection(BuildContext context) {
+    final currentDoc = _documentSteps[_currentStep];
+    final docType = currentDoc['type'] as String;
+    final imagePath = _uploadedDocuments[docType];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (imagePath == null)
+          CustomButton(
+            text: 'Upload Document',
+            onPressed: () => _showImageSourceDialog(docType),
+            isLoading: _isLoading,
+          )
+        else ...[
+          _buildUploadedPreview(currentDoc),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _isLoading ? null : () {
+                    setState(() => _uploadedDocuments[docType] = null);
+                  },
+                  child: const Text('Replace'),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: CustomButton(
+                  text: 'Confirm & Upload',
+                  onPressed: () => _uploadDocument(docType),
+                  isLoading: _isLoading,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
   Future<void> _pickImage(ImageSource source, String docType) async {
     final picker = ImagePicker();
     
     try {
-      final image = await picker.pickImage(source: source);
-      if (image != null) {
-        setState(() => _uploadedDocuments[docType] = image.path);
+      final XFile? pickedFile = await picker.pickImage(
+        source: source,
+        imageQuality: 85,
+        maxWidth: 1024,
+        maxHeight: 1024,
+      );
+      
+      if (pickedFile != null) {
+        final File tempFile = File(pickedFile.path);
+        
+        if (await tempFile.exists()) {
+          if (mounted) {
+            setState(() => _uploadedDocuments[docType] = tempFile.path);
+          }
+        } else {
+          throw Exception('Selected file does not exist');
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error selecting image')),
-      );
+      if (mounted) {
+        print('Error picking image: $e'); // Debug log
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error selecting image: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _uploadDocument(String docType) async {
+    setState(() => _isLoading = true);
+
+    try {
+      // Simulate API call
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Document uploaded successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        // Move to next step if available
+        if (_currentStep < _documentSteps.length - 1) {
+          setState(() {
+            _currentStep++;
+            _isLoading = false;
+          });
+        } else {
+          // All documents uploaded
+          setState(() => _isLoading = false);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error uploading document: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -283,5 +402,79 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
       );
       Navigator.pop(context, true);
     }
+  }
+
+  Widget _buildImagePreview(String imagePath) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Builder(
+        builder: (context) {
+          final file = File(imagePath);
+          if (!file.existsSync()) {
+            return _buildErrorContainer();
+          }
+          return Image.file(
+            file,
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              print('Error loading image: $error'); // Debug log
+              return _buildErrorContainer();
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildErrorContainer() {
+    return Container(
+      height: 200,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 48,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Unable to load image',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSafeImageFromFile(String path) {
+    return FutureBuilder<bool>(
+      future: File(path).exists(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data == true) {
+          return Image.file(
+            File(path),
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              print('Error loading image: $error');
+              return _buildErrorContainer();
+            },
+          );
+        }
+        return _buildErrorContainer();
+      },
+    );
   }
 }

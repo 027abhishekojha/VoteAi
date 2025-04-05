@@ -130,15 +130,19 @@ class CandidatesScreen extends StatelessWidget {
     );
   }
 
-  void _handleVoteSelection(BuildContext context, Map<String, dynamic> candidate) {
+  void _handleVoteSelection(BuildContext context, Map<String, String> candidate) {
+    // Navigate to OTP verification first
     Navigator.pushNamed(
       context,
-      '/otp-verification',
+      '/vote-otp-verification',
       arguments: {
-        'name': candidate['name'] ?? 'Unknown',
-        'party': candidate['party'] ?? 'Unknown Party',
-        'manifesto': candidate['manifesto'] ?? 'No manifesto available',
-        'achievements': candidate['achievements'] ?? 'No achievements listed',
+        'candidateData': {
+          'name': candidate['name'] ?? 'Unknown',
+          'party': candidate['party'] ?? 'Unknown Party',
+          'manifesto': candidate['manifesto'] ?? 'No manifesto available',
+          'achievements': candidate['achievements'] ?? 'No achievements listed',
+        },
+        'phoneNumber': '+91 1234567890', // Replace with actual user's phone number
       },
     );
   }

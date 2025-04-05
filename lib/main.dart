@@ -24,7 +24,7 @@ import 'screens/new_otp_verification_screen.dart';
 import 'package:aivote/screens/candidates_screen.dart';
 import 'package:aivote/screens/vote_confirmation_screen.dart';
 import 'package:aivote/screens/vote_success_screen.dart';
-
+import 'package:aivote/screens/vote_otp_verification_screen.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
@@ -91,6 +91,17 @@ class MyApp extends StatelessWidget {
           case '/document-upload':
             return MaterialPageRoute(
               builder: (context) => const DocumentUploadScreen(),
+            );
+          
+          case '/vote-otp-verification':
+            final args = settings.arguments as Map<String, dynamic>?;
+            if (args == null) return null;
+            
+            return MaterialPageRoute(
+              builder: (context) => VoteOtpVerificationScreen(
+                phoneNumber: args['phoneNumber'] as String,
+                candidateData: args['candidateData'] as Map<String, dynamic>,
+              ),
             );
         }
         return null;
