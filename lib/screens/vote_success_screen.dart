@@ -39,12 +39,22 @@ class VoteSuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               CustomButton(
-                text: 'Return to Home',
+                text: 'View Vote Result Summary',
+                onPressed: () => Navigator.pushNamed(context, '/vote-result-summary'),
+              ),
+              const SizedBox(height: 16),
+              CustomButton(
+                text: 'View Pending Votes',
+                onPressed: () => Navigator.pushNamed(context, '/pending-results'),
+              ),
+              const SizedBox(height: 32),
+              TextButton(
                 onPressed: () => Navigator.pushNamedAndRemoveUntil(
                   context,
                   '/home',
                   (route) => false,
                 ),
+                child: const Text('Return to Home'),
               ),
             ],
           ),

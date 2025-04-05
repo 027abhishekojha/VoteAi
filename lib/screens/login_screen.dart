@@ -16,9 +16,6 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   var _isLoading = false;
-  bool _isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-  }
 
   @override
   void initState() {
@@ -31,21 +28,27 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
     _animationController.forward();
-  }
+  }   
 
   @override
   void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
   Future<void> _handleSignIn() async {
-    if (_isLoading) return; // Prevent multiple calls while loading
+    if (_isLoading) return;
 
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isLoading = true);
       try {
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 2)); // Simulate API call
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/home');
         }
@@ -67,173 +70,21 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
       backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
             child: FadeTransition(
               opacity: _fadeAnimation,
               child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 40),
-                    Center(
-                      child: Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xFF4CAF50),  // Fresh green
-                              const Color(0xFF81C784),  // Light green
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(35),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF4CAF50).withAlpha(51),
-                              blurRadius: 20,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.how_to_vote_rounded,
-                          size: 70,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(28),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withAlpha(13),
-                            blurRadius: 20,
-                            spreadRadius: 10,
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          CustomTextField(
-                            label: 'Email',
-                            hint: 'Enter your email',
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value?.isEmpty ?? true) {
-                                return 'Email is required';
-                              }
-                              if (!_isValidEmail(value!)) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24),
-                          CustomTextField(
-                            label: 'Password',
-                            hint: 'Enter your password',
-                            controller: _passwordController,
-                            isPassword: true,
-                            validator: (value) {
-                              if (value?.isEmpty ?? true) {
-                                return 'Password is required';
-                              }
-                              if ((value?.length ?? 0) < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () {},
-                              child: Text(
-                                'Forgot Password?',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.secondary,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 32),
-                          CustomButton(
-                            text: 'Sign In',
-                            onPressed: () {
-                              if (!_isLoading) {
-                                Navigator.pushReplacementNamed(context, '/home');
-                              }
-                            },
-                            isLoading: _isLoading,
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            'Or continue with',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _buildSocialButton(
-                                'assets/icons/google.png',
-                                () {},
-                                'Google',
-                              ),
-                              _buildSocialButton(
-                                'assets/icons/facebook.png',
-                                () {},
-                                'Facebook',
-                              ),
-                              _buildSocialButton(
-                                'assets/icons/apple.png',
-                                () {},
-                                'Apple',
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                    _buildLogo(),
+                    const SizedBox(height: 40),
+                    _buildLoginForm(),
                     const SizedBox(height: 24),
-                    Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Don\'t have an account? ',
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pushNamed(context, '/signup'),
-
-                            child: Text(
-                              'Sign Up',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                    _buildSignUpLink(),
                   ],
                 ),
               ),
@@ -244,25 +95,281 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
     );
   }
 
-  Widget _buildSocialButton(String iconPath, VoidCallback onTap, String label) {
-    return Tooltip(
-      message: 'Sign in with $label',
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[200]!),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Image.asset(
-            iconPath,
-            height: 32,
-            width: 32,
-          ),
+  Widget _buildLogo() {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            // Animated circuit pattern background
+            Container(
+              width: 160,
+              height: 160,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(40),
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: CustomPaint(
+                painter: CircuitPatternPainter(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                ),
+              ),
+            ),
+            // Main logo container
+            Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.primary,
+                    Theme.of(context).colorScheme.secondary,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(35),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // AI Text with neon effect
+                  Positioned(
+                    left: 20,
+                    child: Text(
+                      'AI',
+                      style: TextStyle(
+                        fontFamily: 'Orbitron', // You'll need to add this font
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        foreground: Paint()
+                          ..shader = LinearGradient(
+                            colors: [
+                              Colors.white,
+                              Colors.white.withOpacity(0.8),
+                            ],
+                          ).createShader(const Rect.fromLTWH(0, 0, 50, 40)),
+                        shadows: [
+                          Shadow(
+                            color: Colors.white.withOpacity(0.8),
+                            blurRadius: 15,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Vote icon
+                  const Positioned(
+                    right: 20,
+                    child: Icon(
+                      Icons.how_to_vote_rounded,
+                      size: 48,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
+        const SizedBox(height: 24),
+        Text(
+          'Secure Voting with AI',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                foreground: Paint()
+                  ..shader = LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.secondary,
+                    ],
+                  ).createShader(const Rect.fromLTWH(0, 0, 200, 40)),
+              ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginForm() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          CustomTextField(
+            label: 'Email',
+            hint: 'Enter your email',
+            controller: _emailController,
+            keyboardType: TextInputType.emailAddress,
+            validator: (value) {
+              if (value?.isEmpty ?? true) return 'Email is required';
+              if (!_isValidEmail(value!)) return 'Please enter a valid email';
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          CustomTextField(
+            label: 'Password',
+            hint: 'Enter your password',
+            controller: _passwordController,
+            isPassword: true,
+            validator: (value) {
+              if (value?.isEmpty ?? true) return 'Password is required';
+              if ((value?.length ?? 0) < 6) {
+                return 'Password must be at least 6 characters';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 24),
+          CustomButton(
+            text: 'Sign In',
+            onPressed: _handleSignIn,
+            isLoading: _isLoading,
+          ),
+        ],
       ),
     );
   }
+
+  Widget _buildSignUpLink() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Don\'t have an account? ',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        TextButton(
+          onPressed: () => Navigator.pushNamed(context, '/signup'),
+          child: Text(
+            'Sign Up',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Add this custom painter class at the bottom of the file
+class NeuralNetworkPainter extends CustomPainter {
+  final Color color;
+
+  NeuralNetworkPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    final nodeRadius = 3.0;
+    final nodePaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    // Draw neural network nodes and connections
+    for (var i = 0; i < 5; i++) {
+      for (var j = 0; j < 5; j++) {
+        final x = size.width * (i + 1) / 6;
+        final y = size.height * (j + 1) / 6;
+
+        // Draw node
+        canvas.drawCircle(Offset(x, y), nodeRadius, nodePaint);
+
+        // Draw connections
+        if (i < 4) {
+          canvas.drawLine(
+            Offset(x, y),
+            Offset(size.width * (i + 2) / 6, size.height * (j + 1) / 6),
+            paint,
+          );
+        }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Add this custom painter class for the circuit pattern
+class CircuitPatternPainter extends CustomPainter {
+  final Color color;
+
+  CircuitPatternPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    final double spacing = size.width / 8;
+    
+    // Draw horizontal and vertical lines
+    for (var i = 1; i < 8; i++) {
+      // Horizontal lines with dots
+      if (i % 2 == 0) {
+        canvas.drawLine(
+          Offset(0, i * spacing),
+          Offset(size.width, i * spacing),
+          paint,
+        );
+        
+        // Add connection dots
+        for (var j = 1; j < 8; j += 2) {
+          canvas.drawCircle(
+            Offset(j * spacing, i * spacing),
+            2,
+            Paint()..color = color,
+          );
+        }
+      }
+      
+      // Vertical lines with dots
+      if (i % 2 == 0) {
+        canvas.drawLine(
+          Offset(i * spacing, 0),
+          Offset(i * spacing, size.height),
+          paint,
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

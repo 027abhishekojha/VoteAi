@@ -1,139 +1,243 @@
+import 'package:aivote/screens/Verification_steps.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_button.dart';
 
 class VerificationScreen extends StatefulWidget {
-  const VerificationScreen({super.key});
+  const VerificationScreen({Key? key}) : super(key: key);
 
   @override
   State<VerificationScreen> createState() => _VerificationScreenState();
 }
 
 class _VerificationScreenState extends State<VerificationScreen> {
-  bool _faceVerified = false;
-  bool _documentVerified = false;
+  bool _isFacialRecognitionDone = false;
+  bool _isDocumentVerificationDone = false;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Verify Identity'),
-        centerTitle: true,
+        title: const Text('Identity Verification'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildVerificationStatus(),
-            const SizedBox(height: 32),
-            _buildVerificationSteps(),
-            const SizedBox(height: 32),
-            _buildVerifyButton(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVerificationStatus() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
+      body: Stack(
         children: [
-          const Icon(Icons.security, size: 48, color: Colors.blue),
-          const SizedBox(height: 16),
-          Text(
-            'Identity Verification Required',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeader(context),
+                const SizedBox(height: 32),
+                _buildVerificationSteps(context),
+                if (_isFacialRecognitionDone && _isDocumentVerificationDone) ...[
+                  const SizedBox(height: 32),
+                  CustomButton(
+                    text: 'Complete Verification',
+                    onPressed: _completeVerification,
+                    isLoading: _isLoading,
+                  ),
+                ],
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'Please complete the verification process to continue voting',
-            textAlign: TextAlign.center,
-          ),
+          if (_isLoading)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
         ],
       ),
     );
   }
 
-  Widget _buildVerificationSteps() {
+  Widget _buildHeader(BuildContext context) {
     return Column(
       children: [
-        _buildVerificationStep(
-          title: 'Face Verification',
-          subtitle: 'Scan your face to verify your identity',
-          icon: Icons.face,
-          isCompleted: _faceVerified,
-          onTap: _startFaceVerification,
+        CircleAvatar(
+          radius: 40,
+          backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          child: Icon(
+            Icons.verified_user_outlined,
+            size: 40,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
         const SizedBox(height: 16),
-        _buildVerificationStep(
-          title: 'Document Verification',
-          subtitle: 'Upload a valid government ID',
-          icon: Icons.document_scanner,
-          isCompleted: _documentVerified,
-          onTap: _startDocumentVerification,
+        Text(
+          'Let\'s Verify Your Identity',
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Complete these steps to verify your identity',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Colors.grey[600],
+              ),
         ),
       ],
     );
   }
 
-  Widget _buildVerificationStep({
+  Widget _buildVerificationSteps(BuildContext context) {
+    return Column(
+      children: [
+        // Facial Recognition Card
+        InkWell(  // Changed from GestureDetector to InkWell for better touch feedback
+          onTap: _isFacialRecognitionDone 
+              ? null 
+              : () => _startFacialRecognition(context),
+          child: _buildVerificationCard(
+            title: 'Facial Recognition',
+            subtitle: _isFacialRecognitionDone 
+                ? 'Facial Recognition Done ✅' 
+                : 'Take a clear selfie for verification',
+            icon: Icons.face_outlined,
+            isDone: _isFacialRecognitionDone,
+            isEnabled: true,
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Document Verification Card
+        InkWell(  // Changed from GestureDetector to InkWell
+          onTap: () {
+            if (_isFacialRecognitionDone && !_isDocumentVerificationDone) {
+              _startDocumentVerification(context);
+            }
+          },
+          child: _buildVerificationCard(
+            title: 'Document Verification',
+            subtitle: _isDocumentVerificationDone 
+                ? 'Document Verification Done ✅' 
+                : 'Upload a valid government ID',
+            icon: Icons.document_scanner_outlined,
+            isDone: _isDocumentVerificationDone,
+            isEnabled: _isFacialRecognitionDone,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVerificationCard({
     required String title,
     required String subtitle,
     required IconData icon,
-    required bool isCompleted,
-    required VoidCallback onTap,
+    bool isDone = false,
+    bool isEnabled = true,
   }) {
     return Card(
       elevation: 2,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: Container(
-          padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      child: Opacity(
+        opacity: isEnabled ? 1.0 : 0.6,  // Added opacity for disabled state
+        child: Container(
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isCompleted ? Colors.green : Colors.blue,
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(12),
+            color: isDone 
+                ? Colors.green.withOpacity(0.1)
+                : !isEnabled 
+                    ? Colors.grey.withOpacity(0.1)
+                    : Theme.of(context).colorScheme.primary.withOpacity(0.1),
           ),
-          child: Icon(
-            isCompleted ? Icons.check : icon,
-            color: Colors.white,
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDone 
+                        ? Colors.green
+                        : !isEnabled 
+                            ? Colors.grey
+                            : Theme.of(context).colorScheme.primary,
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  isDone ? Icons.check_circle : icon,
+                  color: isDone 
+                      ? Colors.green
+                      : !isEnabled 
+                          ? Colors.grey
+                          : Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: !isEnabled ? Colors.grey : null,
+                          ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: !isEnabled ? Colors.grey : Colors.grey[600],
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              if (!isDone && isEnabled)
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 20,
+                ),
+            ],
           ),
-        ),
-        title: Text(title),
-        subtitle: Text(subtitle),
-        trailing: CustomButton(
-          text: isCompleted ? 'Completed' : 'Start',
-          onPressed: isCompleted ? null : onTap,
-          width: 100,
         ),
       ),
     );
   }
 
-  Widget _buildVerifyButton() {
-    final bool allVerified = _faceVerified && _documentVerified;
-    return CustomButton(
-      text: 'Proceed to Vote',
-      onPressed: allVerified
-          ? () => Navigator.pushNamed(context, '/voting-region')
-          : null,
-    );
+  Future<void> _startFacialRecognition(BuildContext context) async {
+    final result = await Navigator.pushNamed(context, '/facial-recognition');
+    if (result == true && mounted) {
+      setState(() => _isFacialRecognitionDone = true);
+    }
   }
 
-  void _startFaceVerification() {
-    // Implement face verification logic here
-    setState(() => _faceVerified = true);
+  Future<void> _startDocumentVerification(BuildContext context) async {
+    if (!_isFacialRecognitionDone) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please complete facial recognition first'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final result = await Navigator.pushNamed(context, '/document-upload');
+    if (result == true && mounted) {
+      setState(() => _isDocumentVerificationDone = true);
+    }
   }
 
-  void _startDocumentVerification() {
-    // Implement document verification logic here
-    setState(() => _documentVerified = true);
+  Future<void> _completeVerification() async {
+    setState(() => _isLoading = true);
+    
+    // Simulate API call
+    await Future.delayed(const Duration(seconds: 2));
+    
+    if (mounted) {
+      setState(() => _isLoading = false);
+      Navigator.pushReplacementNamed(context, '/home');
+    }
   }
 }

@@ -1,20 +1,30 @@
-import 'package:aivote/screens/candidates_screen.dart';
-import 'package:aivote/screens/vote_confirmation_screen.dart';
-import 'package:aivote/screens/vote_success_screen.dart';
+import 'package:aivote/screens/create_vote_screen.dart';
+import 'package:aivote/screens/results_screen.dart';
+import 'package:aivote/screens/settings_screen.dart';
+import 'package:aivote/screens/vote_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/splash_screen.dart';
+import 'screens/phone_login_otp_screen.dart';
+import 'screens/verification_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/vote_screen.dart';
-import 'screens/results_screen.dart';
-import 'screens/profile_screen.dart';
-import 'screens/settings_screen.dart';
-import 'screens/create_vote_screen.dart';
-import 'screens/verification_screen.dart';
 import 'screens/voting_region_screen.dart';
 import 'screens/available_elections_screen.dart';
-
+import 'screens/vote_result_summary_screen.dart';
+import 'screens/pending_results_screen.dart';
+import 'screens/notifications_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/voting_history_screen.dart';
+import 'screens/election_results_screen.dart';
+import 'screens/security_screen.dart';
+import 'screens/facial_recognition.dart';
+import 'screens/document_upload.dart';
+import 'screens/new_otp_verification_screen.dart';
+import 'package:aivote/screens/candidates_screen.dart';
+import 'package:aivote/screens/vote_confirmation_screen.dart';
+import 'package:aivote/screens/vote_success_screen.dart';
+import 'package:aivote/screens/vote_otp_verification_screen.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
@@ -30,44 +40,126 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
         useMaterial3: true,
+        fontFamily: 'Poppins',
       ),
       initialRoute: '/',
+      // Handle dynamic routes
       onGenerateRoute: (settings) {
-        if (settings.name == '/candidates') {
-          final args = settings.arguments as Map<String, String>?;
-          return MaterialPageRoute(
-            builder: (context) => CandidatesScreen(
-              election: args ?? {'error': 'No election data provided'},
-            ),
-          );
-        }
-        if (settings.name == '/vote-confirmation') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (context) => VoteConfirmationScreen(
-              candidateData: args ?? {'error': 'No candidate data provided'},
-            ),
-          );
-        }
-        if (settings.name == '/vote-success') {
-          final args = settings.arguments as Map<String, dynamic>?;
-          return MaterialPageRoute(
-            builder: (context) => VoteSuccessScreen(
-              voteData: args ?? {'error': 'No vote data provided'},
-            ),
-          );
+        switch (settings.name) {
+          case '/candidates':
+            final args = settings.arguments as Map<String, String>?;
+            return MaterialPageRoute(
+              builder: (context) => CandidatesScreen(
+                election: args ?? {'error': 'No election data provided'},
+              ),
+            );
+          
+          case '/vote-confirmation':
+            final args = settings.arguments as Map<String, dynamic>?;
+            return MaterialPageRoute(
+              builder: (context) => VoteConfirmationScreen(
+                candidateData: args ?? {'error': 'No candidate data provided'},
+              ),
+            );
+          
+          case '/vote-success':
+            final args = settings.arguments as Map<String, dynamic>?;
+            return MaterialPageRoute(
+              builder: (context) => VoteSuccessScreen(
+                voteData: args ?? {'error': 'No vote data provided'},
+              ),
+            );
+          
+          case '/otp-verification':
+            final phoneNumber = settings.arguments as String?;
+            return MaterialPageRoute(
+              builder: (context) => NewOtpVerificationScreen(
+                phoneNumber: phoneNumber ?? '',
+              ),
+            );
+          
+          case '/verification':
+            return MaterialPageRoute(
+              builder: (context) => const VerificationScreen(),
+            );
+          
+          case '/facial-recognition':
+            return MaterialPageRoute(
+              builder: (context) => const FacialRecognitionScreen(),
+            );
+          
+          case '/document-upload':
+            return MaterialPageRoute(
+              builder: (context) => const DocumentUploadScreen(),
+            );
+          
+          case '/vote-otp-verification':
+            final args = settings.arguments as Map<String, dynamic>?;
+            if (args == null) return null;
+            
+            return MaterialPageRoute(
+              builder: (context) => VoteOtpVerificationScreen(
+                phoneNumber: args['phoneNumber'] as String,
+                candidateData: args['candidateData'] as Map<String, dynamic>,
+              ),
+            );
         }
         return null;
       },
+      // Handle unknown routes
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (context) => Scaffold(
+            appBar: AppBar(
+              title: const Text('Page Not Found'),
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Route "${settings.name}" not found',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pushReplacementNamed(context, '/'),
+                    child: const Text('Go to Home'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      // Static routes
       routes: {
         '/': (context) => const SplashScreen(),
+        '/phone-login': (context) => const PhoneLoginScreen(),
+        '/verification': (context) => const VerificationScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
         '/home': (context) => const HomeScreen(),
-        '/verify': (context) => const VerificationScreen(),
-        '/verification': (context) => const VerificationScreen(),
         '/voting-region': (context) => const VotingRegionScreen(),
         '/available-elections': (context) => const AvailableElectionsScreen(),
+        '/vote-result-summary': (context) => const VoteResultSummaryScreen(),
+        '/pending-results': (context) => const PendingResultsScreen(),
+        '/notifications': (context) => const NotificationsScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/voting-history': (context) => const VotingHistoryScreen(),
+        '/election-results': (context) => const ElectionResultsScreen(),
+        '/security': (context) => const SecurityScreen(),
+        '/facial-recognition': (context) => const FacialRecognitionScreen(),
+        '/document-upload': (context) => const DocumentUploadScreen(),
+        '/create-vote': (context) => const CreateVoteScreen(),
+        '/results': (context) => const ResultsScreen(),
+        '/settings': (context) => const SettingsScreen(),
       },
     );
   }
@@ -118,6 +210,11 @@ class PagesPreview extends StatelessWidget {
         'title': 'Signup Page',
         'icon': Icons.login,
         'widget': const SignupScreen(),
+      },
+      {
+        'title': 'Facial Recognition',
+        'icon': Icons.face,
+        'widget': const FacialRecognitionScreen(),
       },
     ];
 
