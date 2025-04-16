@@ -11,14 +11,13 @@
 ## 📷 AI Vote Flutter Applicatin Prcess-Flow
 
 <img src="assets/images/process-flow.svg"/>
-```markdown
+
 # 🗳️ AiVote - AI Powered Voting App
 
 Welcome to **AiVote**, a modern, secure, and AI-powered blockchain voting system designed to revolutionize the democratic process.
 
 AiVote ensures **tamper-proof**, **identity-verified**, and **location-authenticated** voting using cutting-edge tools like **Flutter**, **Google Cloud**, **Vertex AI**, and **Ethereum/Polygon** smart contracts.
 
----
 
 ## 🚀 Features
 
@@ -119,8 +118,8 @@ Firestore Logs
 For feature requests, bugs, or unsolicited praise:
 
 - **Author**: Aayushman  
-- **Email**: [Insert yours if you’re brave enough]  
-- **LinkedIn**: [Insert your LinkedIn if you want recruiters to find this]
+- **Email**: abhishekojha.developer@gmail.com
+- **LinkedIn**: www.linkedin.com/in/ojhabhishek
 
 ---
 
