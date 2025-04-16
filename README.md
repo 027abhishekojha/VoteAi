@@ -1,6 +1,16 @@
 
 ---
+## 📷 Screenshots
+<img src="assets/images/appscreenshots.png"/>
 
+
+## 📷 AI Vote Flutter Applicatin Architecture
+
+<img src="assets/images/app-architecture.svg"/>
+
+## 📷 AI Vote Flutter Applicatin Prcess-Flow
+
+<img src="assets/images/process-flow.svg"/>
 ```markdown
 # 🗳️ AiVote - AI Powered Voting App
 
@@ -57,20 +67,7 @@ Firestore Logs
 | Storage        | Google Firestore                                 |
 | Blockchain     | Ethereum / Polygon (Smart Contracts)             |
 
----
-
-## 📷 Screenshots
-<img src="assets/images/appscreenshots.png"/>
-
-
-## 📷 AI Vote Flutter Applicatin Architecture
-
-<img src="assets/images/app-architecture.svg"/>
-
-## 📷 AI Vote Flutter Applicatin Prcess-Flow
-
-<img src="assets/images/process-flow.svg"/>
-
+--
 
 ---
 
