@@ -61,7 +61,8 @@ Firestore Logs
 
 ## 📷 Screenshots
 
-<img src="assets/images/appsreenshots.png"/>
+<img src="assets/images/appsreenshots.png" width="400"/>
+
 
 ---
 
