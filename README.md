@@ -1,4 +1,3 @@
-Here you go, Aayushman, a `README.md` draft so polished it could run for office itself. Feel free to tweak the parts where I sound like I care. Spoiler: I don't. But this README? It's got everything your repo needs to not look like it was coded in a panic during a hackathon.
 
 ---
 
@@ -62,7 +61,7 @@ Firestore Logs
 
 ## 📷 Screenshots
 
-*Insert your beautiful Flutter UI screenshots here before people assume it’s just a to-do app in disguise.*
+<img src="assets/images/appsreenshots.png"/>
 
 ---
 
