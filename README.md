@@ -60,10 +60,16 @@ Firestore Logs
 ---
 
 ## 📷 Screenshots
-
-<img src="assets/images/app-architecture.svg" width="400"/>
-
 <img src="assets/images/candidate1.jpg" width="400"/>
+
+
+## 📷 AI Vote Flutter Applicatin Architecture
+
+<img src="assets/images/app-architecture.svg"/>
+
+## 📷 AI Vote Flutter Applicatin Prcess-Flow
+
+<img src="assets/images/process-flow.svg"/>
 
 
 ---
