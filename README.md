@@ -61,7 +61,7 @@ Firestore Logs
 
 ## 📷 Screenshots
 
-<img src="assets/images/appsreenshots.png" width="400"/>
+<img src="assets/images/app-architecture.svg" width="400"/>
 
 <img src="assets/images/candidate1.jpg" width="400"/>
 
